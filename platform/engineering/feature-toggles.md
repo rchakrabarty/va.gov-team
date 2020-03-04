@@ -15,21 +15,21 @@ Feature toggles are powered by an open-source gem called [Flipper gem](https://g
 
 ## Client behavior
 
-1. During the build process, feature toggle values are retrieved and included in each of the static html pages.
-2. When the page loads, the feature toggle client retrieves the bootstrapped values from the static html and renders the page using those values.
+1. During the build process, feature toggle values are retrieved and included in each of the static HTML pages.
+2. When the page loads, the feature toggle client retrieves the bootstrapped values from the static HTML and renders the page using those values.
 3. After the page is rendered, the feature toggle client retrieves the latest toggle values from the feature toggle service.
 4. The page is updated using the latest feature toggle values.
 
 ## User experience (UX) considerations
 
-There are a couple ways to do release toggles. Each of these has UX trade offs.
+There are a couple of ways to use release toggles, both of which have UX trade offs:
 
 - **Use the bootstrapped values on the initial render.** The application uses the values from the static page first and _updates_ the markup if the values retrieved from the service are different. This works well for content that is not visible on the initial render of the page. Ideally, the update is either not visible to the user or comes into view using a simple CSS transition.
 - **Ignore the bootstrapped values and show a loading state for the feature.** The applicaton shows a loading state for the new feature while the toggle values are retrieved from the service. This works well for content that is visible on the initial render of the page. There's no standardized approach — the way this is updated is depdendent on your UX goals.
 
 ## Enabling and disabling features
 
-To enable or disables features, log into the Flipper user interface (UI) at the following URLs:
+To enable or disables features, sign into the Flipper user interface (UI) at the following URLs:
 
 |Environment|URL|
 |---|---|
@@ -37,7 +37,7 @@ To enable or disables features, log into the Flipper user interface (UI) at the 
 |Staging|https://staging-api.va.gov/flipper/features| 
 |Production|https://api.va.gov/flipper/features|
 
-To access the Flipper UI, you must log in using an identity-verified id.me user that is listed in [settings.yml](https://github.com/department-of-veterans-affairs/vets-api/blob/master/config/settings.yml):
+To access the Flipper UI, you must sign in using an identity-verified id.me user that is listed in [settings.yml](https://github.com/department-of-veterans-affairs/vets-api/blob/master/config/settings.yml):
 
 ```
 flipper:
@@ -50,6 +50,8 @@ flipper:
 - If you are not on the list, you can add yourself or your teammates. 
 - If you're not sure if your account is identity-verified, you can check by going to [this page](https://www.va.gov/profile/). If you need to verify your account you'll see a "Verify with ID.me" button.
 
+<img width="1287" alt="Screen Shot" src="https://user-images.githubusercontent.com/19188/74881655-b4d11a80-533b-11ea-8e97-fdea24c10830.png">
+
 Once you have logged into the Flipper UI, you can perform the following actions:
 - Select "Enable for everyone” or “Disable for everyone" to enable or disable the feature for all users. 
 - For a gradual rollout or an a/b test you can use "Percentage of Logged in Users." "Percentage of Logged in Users" will enable the feature for the same users each time they return to the site as long as the percentage is not changed. 
@@ -57,9 +59,7 @@ Once you have logged into the Flipper UI, you can perform the following actions:
 - Register a "Group" of users to enable a feature for.
 - You can also roll out a feature for a select few users by adding their email address to the “Users” section. For performance reasons, the list of users is intended to be small — do not use this option for hundreds of users.
 
-The values of each toggle are cached in memory for 1 minute, so it may take that long to see the effect of enabling or disabling the toggle.
-
-<img width="1287" alt="Screen Shot" src="https://user-images.githubusercontent.com/19188/74881655-b4d11a80-533b-11ea-8e97-fdea24c10830.png">
+The values of each toggle are cached in memory for one minute, so it may take that long to see the effect of enabling or disabling the toggle.
 
 ## Adding a new feature toggle
 
@@ -67,7 +67,7 @@ Follow these steps to add and use a new feature toggle to use in `vets-website`:
 
 1. Determine your feature toggle name.
 
-<b>Note:</b> There are no naming conventions yet. Current examples put the app name first, such as _facilityLocatorShowCommunityCares_ and _profileShowDirectDeposit_.
+<b>Note:</b> There are no naming conventions yet. Current examples put the application name first, such as _facilityLocatorShowCommunityCares_ and _profileShowDirectDeposit_.
 
 2. Add the feature toggle name to `vets-website` using camel case: [/src/platform/utilities/feature-toggles/feature-toggle-query-list.json](https://github.com/department-of-veterans-affairs/vets-website/blob/master/src/platform/utilities/feature-toggles/feature-toggle-query-list.json)
 
@@ -89,48 +89,48 @@ Follow these steps to add and use a new feature toggle to use in `vets-website`:
 
 4. Submit a pull request (PR) for each feature. Crosslinking the PRs in a comment will make it easier for the reviewers to check.
 
-4. Run `vets-api` locally. This can be done on master after your PR is merged or off of your feature branch.
+5. Run `vets-api` locally. This can be done on master after your PR is merged or off of your feature branch.
 
-5. Navigate to [http://localhost:3000/flipper/features](http://localhost:3000/flipper/features) and verify that you see your new feature name. If not, restart your rails server.
+6. Navigate to [http://localhost:3000/flipper/features](http://localhost:3000/flipper/features) and verify that you see your new feature name. If not, restart your rails server.
 
-6. Use the selector helper to build a selector for your feature toggle. For example:
+7. Use the selector helper to build a selector for your feature toggle. For example:
 
-```js
-// import the toggleValues helper
-import { toggleValues } from 'platform/site-wide/feature-toggles/selectors';
-
-// use the toggleValues helper to select the toggle values list
-export const appNameThenYourFeatureName = state =>
+ ```js
+ // import the toggleValues helper
+ import { toggleValues } from 'platform/site-wide/feature-toggles/selectors';
+ 
+ // use the toggleValues helper to select the toggle values list
+ export const appNameThenYourFeatureName = state =>
   toggleValues(state).appNameThenYourFeatureName;
-```
+ ```
 
 The `toggleValues` object is simply a flat list of `toggleName` and boolean key value pairs.
 
-7. Use the feature toggle value to gate your new behavior. For example, you can use the select above in `mapStateToProps` to pass the toggle as a prop into your component.
+8. Use the feature toggle value to gate your new behavior. For example, you can use the select above in `mapStateToProps` to pass the toggle as a prop into your component.
 
-```js
-function mapStateToProps(state) {
-  return {
-    showYourFeatureName:
-      appNameThenYourFeatureName(state),
-  };
-}
+ ```js
+ function mapStateToProps(state) {
+   return {
+     showYourFeatureName:
+       appNameThenYourFeatureName(state),
+   };
+ }
 
-...
-// inside your connected component
-
-render() {
-   const { showYourFeatureName } = this.props;
-
-   return (
-     { showYourFeatureName && <NewFeature /> }
-   );
-}
-```
-
+ ...
+ // inside your connected component
+ 
+ render() {
+    const { showYourFeatureName } = this.props;
+ 
+    return (
+      { showYourFeatureName && <NewFeature /> }
+    );
+ }
+ ```
+ 
 Currently the feature toggles values are only available on the global redux state.
 
-8. Use the Flipper admin to test out the toggle locally.
+9. Use the Flipper admin to test out the toggle locally.
 
   ![](../../../images/platform/feature-flags/change-feature-toggle-value.png)
 
