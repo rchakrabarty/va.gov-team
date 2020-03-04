@@ -8,9 +8,27 @@ Currently feature toggles are managed by designated administrators (ask in #VSP-
 - Training documents: #vsp-tools-fe
 - Product feedback or new feature requests: #vsp-tools-fe
 
-The feature toggles are powered by an open-source gem called [Flipper gem](https://github.com/jnunemaker/flipper).
+Feature toggles are powered by an open-source gem called [Flipper gem](https://github.com/jnunemaker/flipper). Feature toggles:
+- Allow for production toggle switching without redeploying `vets-website`
+- Provide a UI for managing feature toggle behavior
+- Provide code helpers for handling common UX scenarios
 
-## Managing feature toggles
+## Client behavior
+
+1. During the build process, feature toggle values are retrieved and included in each of the static html pages.
+2. When the page loads, the feature toggle client retrieves the bootstrapped values from the static html and renders the page using those values.
+3. After the page is rendered, the feature toggle client retrieves the latest toggle values from the feature toggle service.
+4. The page is updated using the latest feature toggle values.
+
+## User experience (UX) considerations
+
+There are a couple ways to do release toggles. Each of these has UX trade offs.
+
+- **Use the bootstrapped values on the initial render.** The application uses the values from the static page first and _updates_ the markup if the values retrieved from the service are different. This works well for content that is not visible on the initial render of the page. Ideally, the update is either not visible to the user or comes into view using a simple CSS transition.
+- **Ignore the bootstrapped values and show a loading state for the feature.** The applicaton shows a loading state for the new feature while the toggle values are retrieved from the service. This works well for content that is visible on the initial render of the page. There's no standardized approach — the way this is updated is depdendent on your UX goals.
+
+## Enabling and disabling features
+
 To enable or disables features, log into the Flipper user interface (UI) at the following URLs:
 
 |Environment|URL|
@@ -43,11 +61,83 @@ The values of each toggle are cached in memory for 1 minute, so it may take that
 
 <img width="1287" alt="Screen Shot" src="https://user-images.githubusercontent.com/19188/74881655-b4d11a80-533b-11ea-8e97-fdea24c10830.png">
 
-## Front end implementation
-The front end queries the `/v0/feature_toggles` endpoint ([swagger](https://department-of-veterans-affairs.github.io/va-digital-services-platform-docs/api-reference/#/site/getFeatureToggless)), which returns true/false for each feature toggle. See [Front end feature flags](https://department-of-veterans-affairs.github.io/veteran-facing-services-tools/platform/tools/feature-flags/) ("Release toggles") for more information.
+## Adding a new feature toggle
+
+Follow these steps to add and use a new feature toggle to use in `vets-website`:
+
+1. Determine your feature toggle name.
+
+<b>Note:</b> There are no naming conventions yet. Current examples put the app name first, such as _facilityLocatorShowCommunityCares_ and _profileShowDirectDeposit_.
+
+2. Add the feature toggle name to `vets-website` using camel case: [/src/platform/utilities/feature-toggles/feature-toggle-query-list.json](https://github.com/department-of-veterans-affairs/vets-website/blob/master/src/platform/utilities/feature-toggles/feature-toggle-query-list.json)
+
+ ```json
+{
+    "featureToggleQueryList": ["appNameThenYourFeatureName"]
+}
+ ```
+
+3. Add the feature name to `vets-api` using snake case: [config/features.yml](https://github.com/department-of-veterans-affairs/vets-api/blob/master/config/features.yml)
+
+  ```yml
+ features:
+   app_name_then_your_feature_name:
+     description: >
+       On https://www.va.gov/find-locations/ enables search box.
+       This toggle is owned by the search team.
+  ```
+
+4. Submit a pull request (PR) for each feature. Crosslinking the PRs in a comment will make it easier for the reviewers to check.
+
+4. Run `vets-api` locally. This can be done on master after your PR is merged or off of your feature branch.
+
+5. Navigate to [http://localhost:3000/flipper/features](http://localhost:3000/flipper/features) and verify that you see your new feature name. If not, restart your rails server.
+
+6. Use the selector helper to build a selector for your feature toggle. For example:
+
+```js
+// import the toggleValues helper
+import { toggleValues } from 'platform/site-wide/feature-toggles/selectors';
+
+// use the toggleValues helper to select the toggle values list
+export const appNameThenYourFeatureName = state =>
+  toggleValues(state).appNameThenYourFeatureName;
+```
+
+The `toggleValues` object is simply a flat list of `toggleName` and boolean key value pairs.
+
+7. Use the feature toggle value to gate your new behavior. For example, you can use the select above in `mapStateToProps` to pass the toggle as a prop into your component.
+
+```js
+function mapStateToProps(state) {
+  return {
+    showYourFeatureName:
+      appNameThenYourFeatureName(state),
+  };
+}
+
+...
+// inside your connected component
+
+render() {
+   const { showYourFeatureName } = this.props;
+
+   return (
+     { showYourFeatureName && <NewFeature /> }
+   );
+}
+```
+
+Currently the feature toggles values are only available on the global redux state.
+
+8. Use the Flipper admin to test out the toggle locally.
+
+  ![](../../../images/platform/feature-flags/change-feature-toggle-value.png)
+
+Updating the feature toggle state on the website requires refreshing the page. This value can take up to a minute to update in staging and production.
 
 ## Back end implementation
-To check if a feature is enabled within the context of a specific user, call  `Flipper.enabled?('facility_locator_show_community_cares', @current_user))`.  The user parameter is optional.
+To check if a feature is enabled within the context of a specific user, call `Flipper.enabled?('facility_locator_show_community_cares', @current_user))`.  The user parameter is optional.
 
 To initialize the feature flag in each environment add the feature name in [config/features.yml](https://github.com/department-of-veterans-affairs/vets-api/blob/master/config/features.yml):
 
@@ -62,3 +152,10 @@ features:
     description: >
       On https://www.va.gov/find-locations/ enable veterans to search for Community care by showing that option in the "Search for" box.
 ```
+
+## Other considerations
+
+- Each environment has its own set of feature toggle values.
+- Test your feature toggle in staging before using it in production.
+- Remove release toggles as soon as they are not needed.
+- Make toggles that are easy to delete by gating a behavior in as few places as possible. It's often better to have blocks of repeating code that can be quickly deleted later than it is to gate several small pieces of code
