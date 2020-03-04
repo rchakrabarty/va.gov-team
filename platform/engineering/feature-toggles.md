@@ -130,7 +130,7 @@ The `toggleValues` object is simply a flat list of `toggleName` and boolean key 
  
 Currently the feature toggles values are only available on the global redux state.
 
-9. Use the Flipper admin to test out the toggle locally.
+9. Use the Flipper UI to test out the toggle locally.
 
   ![](../../../images/platform/feature-flags/change-feature-toggle-value.png)
 
