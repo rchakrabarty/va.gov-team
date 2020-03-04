@@ -43,17 +43,13 @@ The values of each toggle are cached in memory for 1 minute, so it may take that
 
 <img width="1287" alt="Screen Shot" src="https://user-images.githubusercontent.com/19188/74881655-b4d11a80-533b-11ea-8e97-fdea24c10830.png">
 
-## Front End Implementation
-The front end queries the `/v0/feature_toggles` endpoint ([swagger](https://department-of-veterans-affairs.github.io/va-digital-services-platform-docs/api-reference/#/site/getFeatureToggless)), which returns true/false for each feature toggle.
-Full [vets-website feture toggle documentation](https://department-of-veterans-affairs.github.io/veteran-facing-services-tools/platform/tools/feature-flags/) (see Release Toggles).
+## Front end implementation
+The front end queries the `/v0/feature_toggles` endpoint ([swagger](https://department-of-veterans-affairs.github.io/va-digital-services-platform-docs/api-reference/#/site/getFeatureToggless)), which returns true/false for each feature toggle. See [Front end feature flags](https://department-of-veterans-affairs.github.io/veteran-facing-services-tools/platform/tools/feature-flags/) ("Release toggles") for more information.
 
-## Back End Implementation
+## Back end implementation
 To check if a feature is enabled within the context of a specific user, call  `Flipper.enabled?('facility_locator_show_community_cares', @current_user))`.  The user parameter is optional.
 
-To initialize the feature flag (defaulted to disabled in stanging and production and enabled in development and test) in each environment add the feature name to FEATURE_TOGGLES in [config/features.yml](https://github.com/department-of-veterans-affairs/vets-api/blob/master/config/features.yml)
-
-## Adding a new feature toggle
-To add a new feature toggle, add the feature name to [config/features.yml](https://github.com/department-of-veterans-affairs/vets-api/blob/master/config/features.yml):
+To initialize the feature flag in each environment add the feature name in [config/features.yml](https://github.com/department-of-veterans-affairs/vets-api/blob/master/config/features.yml):
 
 ```
 ---
