@@ -1,5 +1,5 @@
 # Feature toggles
-VSP provides feature toggles (also known as feature flags or feature flippers) that can be used in both `vets-api` and `vets-website`. Feature toggles enable VFS teams to test out new functionality (applications, features, VA.gov content pages, Metalsmith) in the VSP development, staging, or production environments for a set of users. Teams can enable or disable a feature for all users, a percentage of all users, a percentage of all logged in users, a list of users, or users defined in a method.
+VSP provides feature toggles (also known as feature flags or feature flippers) that can be used in both vets-api and vets-website. Feature toggles enable VFS teams to test out new functionality (applications, features, VA.gov content pages, Metalsmith) in the VSP development, staging, or production environments for a set of users. Teams can enable or disable a feature for all users, a percentage of all users, a percentage of all logged in users, a list of users, or users defined in a method.
 
 Currently feature toggles are managed by designated administrators (ask in #VSP-Platform-Support slack), but users will be allowed more access in the future. For now, tag the following groups in Slack for more information:
 - Troubleshooting: #vsp-product-support
@@ -9,7 +9,7 @@ Currently feature toggles are managed by designated administrators (ask in #VSP-
 - Product feedback or new feature requests: #vsp-tools-fe
 
 Feature toggles are powered by an open-source gem called [Flipper gem](https://github.com/jnunemaker/flipper). Feature toggles:
-- Allow for production toggle switching without redeploying `vets-website`
+- Allow for production toggle switching without redeploying vets-website
 - Provide a user interface for managing feature toggle behavior
 - Provide code helpers for handling common user experience scenarios
 
@@ -29,7 +29,9 @@ There are a couple of ways to use feature toggles, both of which have UX trade o
 
 ## <a id="flipper_ui">Enabling and disabling features</a>
 
-To enable or disables features, sign into the Flipper user interface (UI) at the following URLs:
+You can enable or disable features in the Flipper user interface (UI):
+
+1. Sign into the Flipper UI at the following URLs:
 
 |Environment|URL|
 |---|---|
@@ -37,7 +39,7 @@ To enable or disables features, sign into the Flipper user interface (UI) at the
 |Staging|https://staging-api.va.gov/flipper/features| 
 |Production|https://api.va.gov/flipper/features|
 
-To access the Flipper UI, you must sign in using an identity-verified id.me user that is listed in [settings.yml](https://github.com/department-of-veterans-affairs/vets-api/blob/master/config/settings.yml):
+2. To access the Flipper UI, you must sign in using an identity-verified id.me user that is listed in [settings.yml](https://github.com/department-of-veterans-affairs/vets-api/blob/master/config/settings.yml):
 
 ```
 flipper:
@@ -46,30 +48,30 @@ flipper:
     - email1@email.us
 ```
 
-<b>Notes:</b> 
-- If you are not on the list, you can add yourself or your teammates in the file. 
-- If you're not sure if your account is identity-verified, you can check by going to [this page](https://www.va.gov/profile/). If you need to verify your account you'll see a "Verify with ID.me" button.
+   <b>Notes:</b> 
+   - If you are not on the list, you can add yourself or your teammates in the file. 
+   - If you're not sure if your account is identity-verified, you can check by going to [this page](https://www.va.gov/profile/). If you need to verify your account you'll see a "Verify with ID.me" button.
 
-<img width="1287" alt="Screen Shot" src="https://user-images.githubusercontent.com/19188/74881655-b4d11a80-533b-11ea-8e97-fdea24c10830.png">
+3. Once you have logged into the Flipper UI, you can perform the following actions:
+   - Select "Enable for everyone" or "Disable for everyone" to enable or disable the feature for all users. 
+   - For a gradual rollout or an a/b test you can use "Percentage of Logged in Users." "Percentage of Logged in Users" will enable the feature for the same users each time they return to the site as long as you don't change the percentage. 
+   - Use "Percentage of Time" to enable a feature for all users for a percentage of time.
+   - Register a "Group" of users to enable a feature for.
+   - You can also roll out a feature for a select few users by adding their email address to the “Users” section. For performance reasons, the list of users is intended to be small — do not use this option for hundreds of users.
 
-Once you have logged into the Flipper UI, you can perform the following actions:
-- Select "Enable for everyone" or "Disable for everyone" to enable or disable the feature for all users. 
-- For a gradual rollout or an a/b test you can use "Percentage of Logged in Users." "Percentage of Logged in Users" will enable the feature for the same users each time they return to the site as long as you don't change the percentage. 
-- Use "Percentage of Time" to enable a feature for all users for a percentage of time.
-- Register a "Group" of users to enable a feature for.
-- You can also roll out a feature for a select few users by adding their email address to the “Users” section. For performance reasons, the list of users is intended to be small — do not use this option for hundreds of users.
-
-The values of each toggle are cached in memory for one minute, so it may take that long to see the effect of enabling or disabling the toggle.
+   The values of each toggle are cached in memory for one minute, so it may take that long to see the effect of enabling or disabling the toggle.
+     
+   <img width="1287" alt="Screen Shot" src="https://user-images.githubusercontent.com/19188/74881655-b4d11a80-533b-11ea-8e97-fdea24c10830.png">
 
 ## Adding a new feature toggle
 
-Follow these steps to add and use a new feature toggle in `vets-website`:
+Follow these steps to add and use a new feature toggle in vets-website:
 
 1. Determine your feature toggle name.
 
 <b>Note:</b> There are no naming conventions yet. Current examples put the application name first, such as _facilityLocatorShowCommunityCares_ and _profileShowDirectDeposit_.
 
-2. Add the feature name (in snake case) to `vets-api` by updating [config/features.yml](https://github.com/department-of-veterans-affairs/vets-api/blob/master/config/features.yml):
+2. Add the feature name (in snake case) to vets-api by updating [config/features.yml](https://github.com/department-of-veterans-affairs/vets-api/blob/master/config/features.yml):
 
   ```yml
  features:
@@ -79,11 +81,11 @@ Follow these steps to add and use a new feature toggle in `vets-website`:
        This toggle is owned by the search team.
   ```
 
-3. Run `vets-api` locally. This can be done on master after your pull request (PR) is merged or off of your feature branch.
+3. Run vets-api locally. This can be done on master after your pull request (PR) is merged or off of your feature branch.
 
 4. Navigate to [http://localhost:3000/flipper/features](http://localhost:3000/flipper/features) and verify that you see your new feature name. If not, restart your rails server.
 
-5. Add the feature toggle name (in camel case) to `vets-website` by updating [feature-toggle-query-list.json](https://github.com/department-of-veterans-affairs/vets-website/blob/master/src/platform/utilities/feature-toggles/feature-toggle-query-list.json):
+5. Add the feature toggle name (in camel case) to vets-website by updating [feature-toggle-query-list.json](https://github.com/department-of-veterans-affairs/vets-website/blob/master/src/platform/utilities/feature-toggles/feature-toggle-query-list.json):
 
  ```json
 {
