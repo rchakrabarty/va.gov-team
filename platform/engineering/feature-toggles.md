@@ -89,7 +89,7 @@ Follow these steps to add and use a new feature toggle in vets-website:
 
  ```js
 const FEATURE_FLAG_NAMES = Object.freeze({
-  appNameThenYourFeatureName: 'appNameThenYourFeatureName',
+  showYourFeatureName: 'appNameThenYourFeatureName',
  ```
 
 6. Submit a PR for each feature. Crosslinking the PRs in a comment will make it easier for the reviewers to check.
