@@ -87,10 +87,9 @@ Follow these steps to add and use a new feature toggle in vets-website:
 
 5. Add the feature toggle name (in camel case) to vets-website by updating [featureFlagNames.js](https://github.com/department-of-veterans-affairs/vets-website/blob/master/src/platform/utilities/feature-toggles/featureFlagNames.js):
 
- ```json
-{
-    "featureToggleQueryList": ["appNameThenYourFeatureName"]
-}
+ ```js
+const FEATURE_FLAG_NAMES = Object.freeze({
+  appNameThenYourFeatureName: 'appNameThenYourFeatureName',
  ```
 
 6. Submit a PR for each feature. Crosslinking the PRs in a comment will make it easier for the reviewers to check.
