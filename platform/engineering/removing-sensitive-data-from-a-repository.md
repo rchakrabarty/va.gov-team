@@ -24,6 +24,11 @@ _Last updated Q1 2020 by VSP Content & IA team_
 1. Notify people that repo has been cleaned and `master` has been unfrozen
 1. Update [purge log](https://github.com/department-of-veterans-affairs/va.gov-team-sensitive/blob/master/platform/engineering/purge-log.md)
 1. Contact GitHub support to permanently remove cached views and references to the sensitive data in pull requests
+   1. Track down the commit SHA
+   1. Search for references to this commit SHA in branches, forks, PRs
+   1. Delete branches that reference the commit – forks require getting the person who owns the fork to delete it
+   1. For forks that reference the commit SHA, ask the fork owner to delete the fork
+   1. Ask github to dereference the PRs and clear their cached references
 
 # Checklist for removing a GitHub issue that contains PII
 
