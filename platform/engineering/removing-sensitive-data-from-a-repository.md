@@ -24,9 +24,12 @@ _Last updated Q1 2020 by VSP Content & IA team_
 1. Notify people that repo has been cleaned and `master` has been unfrozen
 1. Update [purge log](https://github.com/department-of-veterans-affairs/va.gov-team-sensitive/blob/master/platform/engineering/purge-log.md)
 1. Contact GitHub support to permanently remove cached views and references to the sensitive data in pull requests
-   1. Track down the commit SHA
+   1. Track down the [commit SHA](https://help.github.com/en/github/getting-started-with-github/github-glossary#commit) where the sensitive info was introduced into the `master` branch
+      1. It should look something like `393b80fb36a532fb79237a4ebb62c7a21388bd97`
    1. Search for references to this commit SHA in branches, forks, PRs
-   1. Delete branches that reference the commit – forks require getting the person who owns the fork to delete it
+      - You can use [`git for-each-ref`](https://git-scm.com/docs/git-for-each-ref) to search for references
+      - For example:  `git for-each-ref --contains 9aba403a6184c3662e16d2bd01bae31e686b5be6`
+   1. Delete branches that reference the commit
    1. For forks that reference the commit SHA, ask the fork owner to delete the fork
    1. Ask github to dereference the PRs and clear their cached references
 
